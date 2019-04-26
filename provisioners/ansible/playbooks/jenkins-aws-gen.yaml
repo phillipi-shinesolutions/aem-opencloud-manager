@@ -46,16 +46,40 @@
 
     ########################################################################
     # Traverse AEM OpenCloud Configuration files and list down all available
-    # configuration profiles for each AEM OpenCloud library.
+    # configuration profiles for each AEM OpenCloud library category.
     # These configuration profiles will then be used to structure the generated
     # Jenkins pipelines.
     ########################################################################
 
-    - name: Create a list of Packer AEM configuration profiles
+    - name: Create a list of Packer AEM configuration profiles for AWS resources
       shell: echo {{ item.path }}
       with_filetree: ../../../stage/aem-opencloud-config/packer-aem/
-      when: item.state == 'directory'
-      register: packer_aem_profiles
+      when: item.state == 'directory' and item.path is match ('aws-resources-*')
+      register: packer_aem_aws_resources_profiles
+
+    - name: Trim skipped Packer AEM configuration profiles for AWS resources
+      set_fact:
+        packer_aem_aws_resources_profiles_trimmed: "{{ packer_aem_aws_resources_profiles | trim_skipped() }}"
+
+    - name: Create a list of Packer AEM configuration profiles for AWS AMIs
+      shell: echo {{ item.path }}
+      with_filetree: ../../../stage/aem-opencloud-config/packer-aem/
+      when: item.state == 'directory' and item.path is match ('aws-*') and item.path is not match ('aws-resources-*')
+      register: packer_aem_aws_profiles
+
+    - name: Trim skipped Packer AEM configuration profiles for AWS AMIs
+      set_fact:
+        packer_aem_aws_profiles_trimmed: "{{ packer_aem_aws_profiles | trim_skipped() }}"
+
+    - name: Create a list of AEM AWS Stack Builder configuration profiles for AWS resources
+      shell: echo {{ item.path }}
+      with_filetree: ../../../stage/aem-opencloud-config/aem-aws-stack-builder/
+      when: item.state == 'directory' and item.path is match ('aws-resources-*')
+      register: aem_aws_stack_builder_aws_resources_profiles
+
+    - name: Trim skipped AEM AWS Stack Builder configuration profiles for AWS resources
+      set_fact:
+        aem_aws_stack_builder_aws_resources_profiles_trimmed: "{{ aem_aws_stack_builder_aws_resources_profiles | trim_skipped() }}"
 
     - name: Create a list of AEM AWS Stack Builder AEM Stack Manager configuration profiles
       shell: echo {{ item.path }}
@@ -63,11 +87,19 @@
       when: item.state == 'directory' and item.path is match ('aem-stack-manager-*')
       register: aem_aws_stack_builder_aem_stack_manager_profiles
 
+    - name: Trim skipped AEM AWS Stack Builder AEM Stack Manager configuration profiles
+      set_fact:
+        aem_aws_stack_builder_aem_stack_manager_profiles_trimmed: "{{ aem_aws_stack_builder_aem_stack_manager_profiles | trim_skipped() }}"
+
     - name: Create a list of AEM AWS Stack Builder AEM Consolidated configuration profiles
       shell: echo {{ item.path }}
       with_filetree: ../../../stage/aem-opencloud-config/aem-aws-stack-builder/
       when: item.state == 'directory' and item.path is match ('aem-consolidated-*')
       register: aem_aws_stack_builder_aem_consolidated_profiles
+
+    - name: Trim skipped AEM AWS Stack Builder AEM Consolidated configuration profiles
+      set_fact:
+        aem_aws_stack_builder_aem_consolidated_profiles_trimmed: "{{ aem_aws_stack_builder_aem_consolidated_profiles | trim_skipped() }}"
 
     - name: Create a list of AEM AWS Stack Builder AEM Full-Set configuration profiles
       shell: echo {{ item.path }}
@@ -75,11 +107,39 @@
       when: item.state == 'directory' and item.path is match ('aem-full-set-*')
       register: aem_aws_stack_builder_aem_full_set_profiles
 
+    - name: Trim skipped AEM AWS Stack Builder AEM Full-Set configuration profiles
+      set_fact:
+        aem_aws_stack_builder_aem_full_set_profiles_trimmed: "{{ aem_aws_stack_builder_aem_full_set_profiles | trim_skipped() }}"
+
+    - name: Create a list of AEM AWS Stack Builder AEM Upgrade configuration profiles
+      shell: echo {{ item.path }}
+      with_filetree: ../../../stage/aem-opencloud-config/aem-aws-stack-builder/
+      when: item.state == 'directory' and item.path is match ('aem-upgrade-*')
+      register: aem_aws_stack_builder_aem_upgrade_profiles
+
+    - name: Trim skipped Packer AEM configuration profiles
+      set_fact:
+        aem_aws_stack_builder_aem_upgrade_profiles_trimmed: "{{ aem_aws_stack_builder_aem_upgrade_profiles | trim_skipped() }}"
+
+    - name: Create a list of AEM AWS Stack Builder AEM Reconfiguration configuration profiles
+      shell: echo {{ item.path }}
+      with_filetree: ../../../stage/aem-opencloud-config/aem-aws-stack-builder/
+      when: item.state == 'directory' and item.path is match ('aem-reconfiguration-*')
+      register: aem_aws_stack_builder_aem_reconfiguration_profiles
+
+    - name: Trim skipped AEM AWS Stack Builder AEM Reconfiguration configuration profiles
+      set_fact:
+        aem_aws_stack_builder_aem_reconfiguration_profiles_trimmed: "{{ aem_aws_stack_builder_aem_reconfiguration_profiles | trim_skipped() }}"
+
     - name: Create a list of AEM Stack Manager Messenger configuration profiles
       shell: echo {{ item.path }}
       with_filetree: ../../../stage/aem-opencloud-config/aem-stack-manager-messenger/
       when: item.state == 'directory'
       register: aem_stack_manager_messenger_profiles
+
+    - name: Trim skipped AEM Stack Manager Messenger configuration profiles
+      set_fact:
+        aem_stack_manager_messenger_profiles_trimmed: "{{ aem_stack_manager_messenger_profiles | trim_skipped() }}"
 
     - name: Create a list of AEM Test Suite configuration profiles
       shell: echo {{ item.path }}
@@ -87,11 +147,35 @@
       when: item.state == 'directory'
       register: aem_test_suite_profiles
 
+    - name: Trim skipped AEM Test Suite configuration profiles
+      set_fact:
+        aem_test_suite_profiles_trimmed: "{{ aem_test_suite_profiles | trim_skipped() }}"
+
+    - name: Create a list of AEM AWS Stack Builder AEM Testing Blue-Gren configuration profiles
+      shell: echo {{ item.path }}
+      with_filetree: ../../../stage/aem-opencloud-config/aem-aws-stack-builder/
+      when: item.state == 'directory' and item.path is match ('aem-testing-blue-green-*')
+      register: aem_testing_blue_green_profiles
+
+    - name: Trim skipped AEM AWS Stack Builder AEM Testing Blue-Gren configuration profiles
+      set_fact:
+        aem_testing_blue_green_profiles_trimmed: "{{ aem_testing_blue_green_profiles | trim_skipped() }}"
+
+    - name: Create a list of AEM AWS Stack Builder AEM Testing recovery configuration profiles
+      shell: echo {{ item.path }}
+      with_filetree: ../../../stage/aem-opencloud-config/aem-aws-stack-builder/
+      when: item.state == 'directory' and item.path is match ('aem-testing-recovery-*')
+      register: aem_testing_recovery_profiles
+
+    - name: Trim skipped AEM AWS Stack Builder AEM Testing recovery configuration profiles
+      set_fact:
+        aem_testing_recovery_profiles_trimmed: "{{ aem_testing_recovery_profiles | trim_skipped() }}"
+
     ########################################################################
     # Generate Jenkins jobs directory structure.
     ########################################################################
 
-    - name: "Create category directories for generated AEM OpenCloud Jenkins jobs"
+    - name: "Create category directories for generated jobs"
       file:
         path: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/{{ item.path }}
         state: directory
@@ -105,34 +189,7 @@
         dest: "../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/config.xml"
         mode: '0644'
 
-    - name: "Create category config.xml for generated AEM OpenCloud Jenkins jobs"
-      template:
-        src: '../../../templates/ansible/jenkins/config/category.xml.j2'
-        dest: "../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/{{ item.path }}/config.xml"
-        mode: '0644'
-      with_filetree: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/
-      when: item.state == 'directory'
-
-
-    ########################################################################
-    # Generate Jenkins jobs directory structure.
-    ########################################################################
-
-    - name: "Create category directories for generated AEM OpenCloud Jenkins jobs"
-      file:
-        path: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/{{ item.path }}
-        state: directory
-        mode: '0776'
-      with_filetree: ../../../provisioners/jenkins/jenkinsfiles/aem-opencloud/
-      when: item.state == 'directory'
-
-    - name: "Generate AEM OpenCloud Jenkins project's config.xml"
-      template:
-        src: '../../../templates/ansible/jenkins/config/project.xml.j2'
-        dest: "../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/config.xml"
-        mode: '0644'
-
-    - name: "Create category config.xml for generated AEM OpenCloud Jenkins jobs"
+    - name: "Create category config.xml for generated jobs"
       template:
         src: '../../../templates/ansible/jenkins/config/category.xml.j2'
         dest: "../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/{{ item.path }}/config.xml"
@@ -145,18 +202,55 @@
     ########################################################################
 
     - import_tasks: includes/installation-gen.yaml
-      vars:
-        aem_aws_stack_builder_aem_consolidated_profiles: aem_aws_stack_builder_aem_consolidated_profiles
-        aem_aws_stack_builder_aem_full_set_profiles: aem_aws_stack_builder_aem_full_set_profiles
 
     - import_tasks: includes/machine-images-gen.yaml
-      vars:
-        packer_aem_profiles: packer_aem_profiles
 
     - import_tasks: includes/manage-environments-gen.yaml
+
+    - import_tasks: includes/operational-tasks-gen.yaml
       vars:
-        aem_aws_stack_builder_aem_stack_manager_profiles: aem_aws_stack_builder_aem_stack_manager_profiles
-        aem_aws_stack_builder_aem_consolidated_profiles: aem_aws_stack_builder_aem_consolidated_profiles
-        aem_aws_stack_builder_aem_full_set_profiles: aem_aws_stack_builder_aem_full_set_profiles
-        aem_stack_manager_messenger_profiles: aem_stack_manager_messenger_profiles
-        aem_test_suite_profiles: aem_test_suite_profiles
+        operational_tasks_with_basic_params:
+          - check-readiness-consolidated
+          - check-readiness-full-set
+          - offline-compaction-snapshot-consolidated
+          - offline-compaction-snapshot-full-set
+          - offline-snapshot-consolidated
+          - offline-snapshot-full-set
+          - promote-author
+          - schedule-live-snapshot-consolidated
+          - schedule-offline-compaction-snapshot-consolidated
+          - schedule-offline-compaction-snapshot-full-set
+          - schedule-offline-snapshot-consolidated
+          - schedule-offline-snapshot-full-set
+          - unschedule-live-snapshot-consolidated
+          - unschedule-offline-compaction-snapshot-consolidated
+          - unschedule-offline-compaction-snapshot-full-set
+          - unschedule-offline-snapshot-consolidated
+          - unschedule-offline-snapshot-full-set
+        operational_tasks_with_authorpublish_component_params:
+          - disable-crxde
+          - enable-crxde
+          - list-packages
+          - live-snapshot
+          - schedule-live-snapshot-full-set
+          - unschedule-live-snapshot-full-set
+        operational_tasks_with_dispatcher_component_params:
+          - flush-dispatcher-cache
+        operational_tasks_with_aem_profile_params:
+          - install-aem-profile
+        operational_tasks_with_deploy_package_params:
+          - deploy-artifact
+        operational_tasks_with_export_package_params:
+          - export-package
+        operational_tasks_with_import_package_params:
+          - import-package
+        operational_tasks_with_deployment_descriptor_params:
+          - deploy-artifacts-consolidated
+          - deploy-artifacts-full-set
+        operational_tasks_with_export_descriptor_params:
+          - export-packages-consolidated
+          - export-packages-full-set
+
+    - import_tasks: includes/migration-gen.yaml
+
+    - import_tasks: includes/testing-gen.yaml

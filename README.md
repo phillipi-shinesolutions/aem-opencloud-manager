@@ -13,6 +13,7 @@ Learn more about AEM OpenCloud Manager:
 * [Configuration](https://github.com/shinesolutions/aem-opencloud-manager/blob/master/docs/configuration.md)
 * [Usage](https://github.com/shinesolutions/aem-opencloud-manager#usage)
 * [Testing](https://github.com/shinesolutions/aem-opencloud-manager#testing)
+* [AWS Permissions](https://github.com/shinesolutions/aem-opencloud-manager/blob/master/docs/aws-permissions.md)
 * [Customisation Points](https://github.com/shinesolutions/aem-opencloud-manager/blob/master/docs/customisation-points.md)
 
 AEM OpenCloud Manager is part of [AEM OpenCloud](https://aemopencloud.io) platform.
@@ -29,10 +30,18 @@ Installation
 - Resolve the [Python packages](https://github.com/shinesolutions/aem-opencloud-manager/blob/master/requirements.txt) dependencies by running `make deps`
 - Install the following plugins on your Jenkins instance:
   * [Pipeline Utility Steps plugin](https://plugins.jenkins.io/pipeline-utility-steps)
+- Approve the following script signatures via Jenkins' `Manage Jenkins`->`In-process Script Approval` menu:
+  * `method java.net.URI getHost`
+  * `method java.net.URI getPath`
+  * `method java.net.URI getScheme`
+  * `new java.net.URI java.lang.String`
+  * `staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods drop java.lang.Object[] int`
+  * `staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods init java.lang.Object[]`
 
 Usage
 -----
 
+- Set up the required [AWS Permissions](https://github.com/shinesolutions/aem-opencloud-manager/blob/master/docs/aws-permissions.md)
 - Create [configuration file](https://github.com/shinesolutions/aem-opencloud-manager/blob/master/docs/configuration.md)
 - Generate and provision the pipelines onto a Jenkins instance, for example: `make jenkins-aws config_path=stage/user-config/sandpit/`
 - Visit your Jenkins instance and you should find a new folder named `aem-opencloud-<version>`
@@ -42,12 +51,11 @@ Build categories
 
 | Category | Description |
 |----------|-------------|
-| installation | Installs AEM OpenCloud libraries () followed by the AEM AWS Stack Builder dependency libraries () |
-| machine-images | |
-| manage-environments | |
-| manage-stacks | |
-| operations | |
-| testing | |
+| installation | Install AEM OpenCloud libraries ([Packer AEM](https://github.com/shinesolutions/packer-aem), [AEM AWS Stack Builder](https://github.com/shinesolutions/aem-aws-stack-builder), [AEM Stack Manager Messenger](https://github.com/shinesolutions/aem-stack-manager-messenger), [AEM Test Suite](https://github.com/shinesolutions/aem-test-suite)) followed by the AEM AWS Stack Builder dependency libraries. |
+| machine-images | Create machine images containing AEM installations and utilities. |
+| manage-environments | Create and delete AEM Stack Manager, AEM Consolidated, and AEM Full-Set environments. |
+| operational-tasks | Run AEM operational tasks such as deploying AEM packages, taking backups, flushing cache, promoting AEM Author Standby to become Primary, and many others. |
+| testing | Run various tests against AEM environments. |
 
 Testing
 -------

@@ -5,23 +5,31 @@ aws:
     s3_path: library
 
 aem_opencloud:
-  version: 3.8-pre.0
-  library:
-    packer_aem: 3.7.0
-    aem_aws_stack_builder: 3.6.0
-    aem_stack_manager_messenger: 2.2.0
-    aem_test_suite: 0.9.10
+  version: 4.0.0-pre.2
   config:
     artifact_url: https://overwrite-me/overwrite-me.tar.gz
   custom_manager_steps:
-    artifact_url: https://overwrite-me/overwrite-me.tar.gz
+    artifact_url:
+  custom_image_provisioner:
+    artifact_url:
+  custom_stack_provisioner:
+    artifact_url:
+  descriptors:
+    consolidated:
+      deployment_descriptor_url:
+      export_descriptor_url:
+      content_healthcheck_descriptor_url:
+    full-set:
+      deployment_descriptor_url:
+      export_descriptor_url:
+      content_healthcheck_descriptor_url:
   jenkins_sharedlibs:
-    repo_url: overwrite-me
+    repo_url: https://github.com/shinesolutions/aem-opencloud-manager
     repo_branch: master
 
 jenkins:
   protocol: http
-  host: localhost
+  host: overwrite-me
   port: 8080
   username: overwrite-me
   password: overwrite-me

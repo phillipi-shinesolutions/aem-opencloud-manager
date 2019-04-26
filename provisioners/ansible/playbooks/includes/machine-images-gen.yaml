@@ -1,5 +1,5 @@
 ---
-  
+
 ########################################################################
 # Generate machine-images Jenkins jobs.
 ########################################################################
@@ -10,42 +10,42 @@
   when: item.state == 'file'
   register: machine_images_aws_components
 
-- name: "Generate AEM OpenCloud Jenkins jobs for machine-images configuration profile directories"
+- name: Trim skipped machine images components for AWS
+  set_fact:
+    machine_images_aws_components_trimmed: "{{ machine_images_aws_components | trim_skipped() }}"
+
+- name: "Generate jobs for machine-images configuration profile directories"
   file:
     path: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/machine-images/aws/{{ item[0].item.path }}/
     state: directory
     mode: '0776'
   with_nested:
-    - "{{ packer_aem_profiles.results }}"
-    - "{{ machine_images_aws_components.results }}"
-  when: item[0].skipped is not defined and item[0].item.skipped is not defined and item[1].skipped is not defined and item[1].item.skipped is not defined and item[0].item.path is match ('aws-*')
+    - "{{ packer_aem_aws_profiles_trimmed.results }}"
+    - "{{ machine_images_aws_components_trimmed.results }}"
 
-- name: "Generate AEM OpenCloud Jenkins jobs for machine-images configuration profile config.xml"
+- name: "Generate jobs for machine-images configuration profile config.xml"
   template:
     src: '../../../templates/ansible/jenkins/config/category-config-profile.xml.j2'
     dest: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/machine-images/aws/{{ item[0].item.path }}/config.xml
     mode: '0644'
   with_nested:
-    - "{{ packer_aem_profiles.results }}"
-    - "{{ machine_images_aws_components.results }}"
-  when: item[0].skipped is not defined and item[0].item.skipped is not defined and item[1].skipped is not defined and item[1].item.skipped is not defined and item[0].item.path is match ('aws-*')
+    - "{{ packer_aem_aws_profiles_trimmed.results }}"
+    - "{{ machine_images_aws_components_trimmed.results }}"
 
-- name: "Generate AEM OpenCloud Jenkins jobs for machine-images' configuration profile components"
+- name: "Generate jobs for machine-images' configuration profile components"
   file:
     path: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/machine-images/aws/{{ item[0].item.path }}/{{ item[1].item.path }}/
     state: directory
     mode: '0776'
   with_nested:
-    - "{{ packer_aem_profiles.results }}"
-    - "{{ machine_images_aws_components.results }}"
-  when: item[0].skipped is not defined and item[0].item.skipped is not defined and item[1].skipped is not defined and item[1].item.skipped is not defined and item[0].item.path is match ('aws-*')
+    - "{{ packer_aem_aws_profiles_trimmed.results }}"
+    - "{{ machine_images_aws_components_trimmed.results }}"
 
-- name: "Generate AEM OpenCloud Jenkins jobs config.xml for machine-images configuration profile components"
+- name: "Generate jobs config.xml for machine-images configuration profile components"
   template:
     src: ../../../templates/ansible/jenkins/config/jobs-machine-images.xml.j2
     dest: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/machine-images/aws/{{ item[0].item.path }}/{{ item[1].item.path }}/config.xml
     mode: '0644'
   with_nested:
-    - "{{ packer_aem_profiles.results }}"
-    - "{{ machine_images_aws_components.results }}"
-  when: item[0].skipped is not defined and item[0].item.skipped is not defined and item[1].skipped is not defined and item[1].item.skipped is not defined and item[0].item.path is match ('aws-*')
+    - "{{ packer_aem_aws_profiles_trimmed.results }}"
+    - "{{ machine_images_aws_components_trimmed.results }}"

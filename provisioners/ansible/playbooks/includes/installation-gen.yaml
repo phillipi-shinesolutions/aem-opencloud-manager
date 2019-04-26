@@ -10,21 +10,19 @@
     state: directory
     mode: '0776'
 
-- name: "Generate AEM OpenCloud Jenkins jobs for installation configuration profile AEM AWS Stack Builder Consolidated directories"
+- name: "Generate jobs for installation configuration profile AEM AWS Stack Builder Consolidated directories"
   file:
     path: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/installation/aws/mirror-stack-builder-libraries-{{ item.item.path }}/
     state: directory
     mode: '0776'
-  with_items: "{{ aem_aws_stack_builder_aem_consolidated_profiles.results }}"
-  when: item.skipped is not defined and item.item.skipped is not defined
+  with_items: "{{ aem_aws_stack_builder_aem_consolidated_profiles_trimmed.results }}"
 
-- name: "Generate AEM OpenCloud Jenkins jobs for installation configuration profile AEM AWS Stack Builder Full-Set directories"
+- name: "Generate jobs for installation configuration profile AEM AWS Stack Builder Full-Set directories"
   file:
     path: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/installation/aws/mirror-stack-builder-libraries-{{ item.item.path }}/
     state: directory
     mode: '0776'
-  with_items: "{{ aem_aws_stack_builder_aem_full_set_profiles.results }}"
-  when: item.skipped is not defined and item.item.skipped is not defined
+  with_items: "{{ aem_aws_stack_builder_aem_full_set_profiles_trimmed.results }}"
 
 - name: "Generate AEM OpenCloud Jenkins job for installation configuration profile main libraries config.xml"
   template:
@@ -34,74 +32,67 @@
   with_items:
     - { path: mirror-aem-opencloud-libraries, category: installation, platform_type: aws }
 
-- name: "Generate AEM OpenCloud Jenkins jobs for installation configuration profile AEM AWS Stack Builder Consolidated config.xml"
+- name: "Generate jobs for installation configuration profile AEM AWS Stack Builder Consolidated config.xml"
   template:
     src: '../../../templates/ansible/jenkins/config/jobs-installation.xml.j2'
     dest: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/installation/aws/mirror-stack-builder-libraries-{{ item.item.path }}/config.xml
     mode: '0644'
-  with_items: "{{ aem_aws_stack_builder_aem_consolidated_profiles.results }}"
-  when: item.skipped is not defined and item.item.skipped is not defined
+  with_items: "{{ aem_aws_stack_builder_aem_consolidated_profiles_trimmed.results }}"
 
-- name: "Generate AEM OpenCloud Jenkins jobs for installation configuration profile AEM AWS Stack Builder Full-Set config.xml"
+- name: "Generate jobs for installation configuration profile AEM AWS Stack Builder Full-Set config.xml"
   template:
     src: '../../../templates/ansible/jenkins/config/jobs-installation.xml.j2'
     dest: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/installation/aws/mirror-stack-builder-libraries-{{ item.item.path }}/config.xml
     mode: '0644'
-  with_items: "{{ aem_aws_stack_builder_aem_full_set_profiles.results }}"
-  when: item.skipped is not defined and item.item.skipped is not defined
+  with_items: "{{ aem_aws_stack_builder_aem_full_set_profiles_trimmed.results }}"
 
-- name: "Generate AEM OpenCloud Jenkins jobs for installation configuration profile AEM AWS Stack Builder config.xml"
+- name: "Generate jobs for installation configuration profile AEM AWS Stack Builder config.xml"
   template:
     src: '../../../templates/ansible/jenkins/config/jobs-installation.xml.j2'
     dest: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/installation/aws/mirror-stack-builder-libraries-{{ item.item.path }}/config.xml
     mode: '0644'
-  with_items: "{{ aem_aws_stack_builder_aem_full_set_profiles.results }}"
-  when: item.skipped is not defined and item.item.skipped is not defined
+  with_items: "{{ aem_aws_stack_builder_aem_full_set_profiles_trimmed.results }}"
 
-- name: "Generate AEM OpenCloud Jenkins job for installation configuration profile create-resources directories (packer-aem)"
+- name: "Generate AEM OpenCloud Jenkins job for installation configuration profile Packer AEM AWS resources directories"
+  vars:
+    library: packer-aem
   file:
-    path: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/installation/aws/create-packer-aem-resources-{{ item.item.path }}/
+    path: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/installation/aws/{{ item[1] }}-{{ library }}-resources-{{ item[0].item.path }}/
     state: directory
     mode: '0776'
-  with_items: "{{ packer_aem_profiles.results }}"
-  when: item.skipped is not defined and item.item.skipped is not defined and item.item.path is match ('aws-*')
+  with_nested:
+    - "{{ packer_aem_aws_resources_profiles_trimmed.results }}"
+    - ["create", "delete"]
 
-- name: "Generate AEM OpenCloud Jenkins job for installation configuration profile create-resources directories (stack-builder)"
+- name: "Generate AEM OpenCloud Jenkins job for installation configuration profile AEM AWS Stack Builder AWS resources directories"
+  vars:
+    library: aem-aws-stack-builder
   file:
-    path: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/installation/aws/create-stack-builder-resources-{{ item.item.path }}/
+    path: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/installation/aws/{{ item[1] }}-{{ library }}-resources-{{ item[0].item.path }}/
     state: directory
     mode: '0776'
-  with_items:
-    - "{{ aem_aws_stack_builder_aem_consolidated_profiles.results }}"
-    - "{{ aem_aws_stack_builder_aem_full_set_profiles.results }}"
-  when: item.skipped is not defined and item.item.skipped is not defined
+  with_nested:
+    - "{{ aem_aws_stack_builder_aws_resources_profiles_trimmed.results }}"
+    - ["create", "delete"]
 
-- name: "Generate AEM OpenCloud Jenkins jobs for creating AWS resources config.xml (packer-aem)"
+- name: "Generate jobs for creating Packer AEM AWS resources config.xml"
   vars:
-    resource_name: packer-aem
+    library: packer-aem
   template:
-    src: '../../../templates/ansible/jenkins/config/create-resources.xml.j2'
-    dest: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/installation/aws/create-{{ resource_name }}-resources-{{ item.item.path }}/config.xml
+    src: '../../../templates/ansible/jenkins/config/aws-resources-{{ library }}.xml.j2'
+    dest: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/installation/aws/{{ item[1] }}-{{ library }}-resources-{{ item[0].item.path }}/config.xml
     mode: '0644'
-  with_items: "{{ packer_aem_profiles.results }}"
-  when: item.skipped is not defined and item.item.skipped is not defined and item.item.path is match ('aws-*')
+  with_nested:
+    - "{{ packer_aem_aws_resources_profiles_trimmed.results }}"
+    - ["create", "delete"]
 
-- name: "Generate AEM OpenCloud Jenkins jobs for creating AWS resources config.xml (stack-builder consolidated)"
+- name: "Generate jobs for creating AEM AWS Stack Builder AWS resources config.xml"
   vars:
-    resource_name: stack-builder
+    library: aem-aws-stack-builder
   template:
-    src: '../../../templates/ansible/jenkins/config/create-resources.xml.j2'
-    dest: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/installation/aws/create-{{ resource_name }}-resources-{{ item.item.path }}/config.xml
+    src: '../../../templates/ansible/jenkins/config/aws-resources-{{ library }}.xml.j2'
+    dest: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/installation/aws/{{ item[1] }}-{{ library }}-resources-{{ item[0].item.path }}/config.xml
     mode: '0644'
-  with_items: "{{ aem_aws_stack_builder_aem_consolidated_profiles.results }}"
-  when: item.skipped is not defined and item.item.skipped is not defined
-
-- name: "Generate AEM OpenCloud Jenkins jobs for creating AWS resources config.xml (stack-builder fullstack)"
-  vars:
-    resource_name: stack-builder
-  template:
-    src: '../../../templates/ansible/jenkins/config/create-resources.xml.j2'
-    dest: ../../../stage/jenkins/jobs/aem-opencloud-{{ aem_opencloud.version }}/installation/aws/create-{{ resource_name }}-resources-{{ item.item.path }}/config.xml
-    mode: '0644'
-  with_items: "{{ aem_aws_stack_builder_aem_full_set_profiles.results }}"
-  when: item.skipped is not defined and item.item.skipped is not defined
+  with_nested:
+    - "{{ aem_aws_stack_builder_aws_resources_profiles_trimmed.results }}"
+    - ["create", "delete"]
