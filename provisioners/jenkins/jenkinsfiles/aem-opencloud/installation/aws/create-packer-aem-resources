@@ -20,6 +20,7 @@ pipeline {
     stages {
         stage('Initialise pipeline') {
             steps {
+                echo "init pipeline"
                 JenkinsInit(this, params.AOC_CUSTOM_MANAGER_STEPS_ARTIFACT_URL, env.TMPDIR)
                 JenkinsPipelinePreStep this
             }
