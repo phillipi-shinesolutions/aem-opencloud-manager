@@ -14,7 +14,9 @@ def s3_download(script, bucket, path, object, destDir, destObject=null) {
     destObject = object
   }
   script.sh """
+  set -x
   aws s3 cp s3://${bucket}${path}/${object} ${destDir}/${destObject}
+  set +x
   """
 }
 
