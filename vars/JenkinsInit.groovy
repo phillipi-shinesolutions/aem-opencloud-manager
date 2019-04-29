@@ -10,14 +10,14 @@ def call(script, String aocCustomManagerStepsDownloadUrl, String tmpDir = '/tmp'
   fileName = "custom-manager-steps.tar.gz"
   aocCustomManagerStepsDir = "${tmpDir}/custom-manager-steps/"
   script.sh """
-  echo 'Initialising Jenkins environment...'
+  echo 'Initialising Jenkins environment... Jenkins Init'
   mkdir -p ${tmpDir}/
   """
 
   echo 'jenkinsinit.groozy'
   echo aocCustomManagerStepsDownloadUrl
   println aocCustomManagerStepsDownloadUrl
-  
+
   def parsedUri = new URI(aocCustomManagerStepsDownloadUrl)
   switch (parsedUri.scheme) {
     case "http":

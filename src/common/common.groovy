@@ -11,6 +11,7 @@ package common
 echo "common.groovy"
 def httpDownload(script, url, destDir, fileName) {
   script.sh """
+  echo 'common'
   wget ${url} -O ${destDir}/${fileName}
   """
 }
