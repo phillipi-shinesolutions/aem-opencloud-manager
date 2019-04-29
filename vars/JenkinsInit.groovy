@@ -14,6 +14,7 @@ def call(script, String aocCustomManagerStepsDownloadUrl, String tmpDir = '/tmp'
   mkdir -p ${tmpDir}/
   """
 
+  println "Variable: " + aocCustomManagerStepsDownloadUrl
   def parsedUri = new URI(aocCustomManagerStepsDownloadUrl)
   switch (parsedUri.scheme) {
     case "http":
