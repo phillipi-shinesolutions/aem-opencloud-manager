@@ -14,7 +14,10 @@ def call(script, String aocCustomManagerStepsDownloadUrl, String tmpDir = '/tmp'
   mkdir -p ${tmpDir}/
   """
 
-  echo "jenkinsinit.groozy"
+  echo 'jenkinsinit.groozy'
+  echo aocCustomManagerStepsDownloadUrl
+  println aocCustomManagerStepsDownloadUrl
+  
   def parsedUri = new URI(aocCustomManagerStepsDownloadUrl)
   switch (parsedUri.scheme) {
     case "http":
