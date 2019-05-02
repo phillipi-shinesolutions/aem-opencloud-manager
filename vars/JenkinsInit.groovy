@@ -1,5 +1,6 @@
 #!/usr/bin/env groovy
 import common.*
+import cloud.aws
 
 /**
  * This script downloads AEM OpenCloud custom manager steps from a URL and
